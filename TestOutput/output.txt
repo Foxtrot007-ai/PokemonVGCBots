@@ -1,0 +1,36 @@
+Tue Jun 13 08:32:53 PM UTC 2023
+    RandomPlayer Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 24]
+    OneTurnLookahead Bot vs MyPolicy Bot
+       MATCH RESULTS [39, 51]
+    Minimax Bot vs MyPolicy Bot
+       MATCH RESULTS [26, 51]
+    PrunedBFS Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 4]
+Tue Jun 13 08:33:31 PM UTC 2023
+    RandomPlayer Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 30]
+    OneTurnLookahead Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 14]
+    Minimax Bot vs MyPolicy Bot
+       MATCH RESULTS [1, 51]
+    PrunedBFS Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 45]
+Tue Jun 13 08:33:43 PM UTC 2023
+    RandomPlayer Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 11]
+    OneTurnLookahead Bot vs MyPolicy Bot
+       MATCH RESULTS [15, 51]
+    Minimax Bot vs MyPolicy Bot
+       MATCH RESULTS [20, 51]
+    PrunedBFS Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 18]
+Tue Jun 13 08:33:55 PM UTC 2023
+    RandomPlayer Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 49]
+    OneTurnLookahead Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 46]
+    Minimax Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 37]
+    PrunedBFS Bot vs MyPolicy Bot
+       MATCH RESULTS [51, 40]
