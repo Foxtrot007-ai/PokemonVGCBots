@@ -16,7 +16,41 @@ Few bots for Pokemon-vgc-engine
 ## Trying some examples:
   ```
   python3 example/Example_BattleEcosystem.py 
+  ```
+## Example_Match_All_bots.py
+I modified **Example_Match.py**, so now I can define what bots will fight.
+I use only this four bots for now.
 ```
+def main():
+    # get argument from command
+    option = sys.argv[1]
+    print(option)
+    # decide which opponent to test self with
+    bot = None
+    if option == "RandomPlayer":
+        bot = RandomPlayer()
+    elif option == "OneTurnLookahead":
+        bot = OneTurnLookahead()
+    elif option == "Minimax":
+        bot = Minimax()
+    elif option == "PrunedBFS":
+        bot = PrunedBFS()
+    else:
+        bot = RandomPlayer()
+    #play match
+    match(option)
+```
+
+## Using TestBot.sh
+TestBot.sh is simple bash script that starts battles with bots defined in myArray.
+It uses **Example_Match_All_bots.py** with arguments from myArray.
+
+Put it in **pokemon-vgc-engine-master** directory.
+Use it like this with virtualenvwrapper and venv configured:
+```
+./TestBot.sh
+```
+Also create **TestOutput/output.txt** for logging.
 ## Battle policy problem
 Example bots defined in BattlePolicies.py use TeamPredictions or Public information:
 >Forward Model
@@ -80,7 +114,7 @@ It is written in /engine/PkmBattleEnv.py
                                                      new_active.moves[3].power]))
 ```
 Switch function with argument -1 is random switch.
-## My bot, some simple heuristics
+## My Policy bot, some simple heuristics
 I put here some simple hierarchy of decisions. 
 For example, if some action is not effective or useless due to e.g. using a damaging move with a resisted type, checking will drop one level lower in hierarchy.
 ## Hierarchy for know:
