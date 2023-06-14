@@ -137,24 +137,39 @@ to do
 to do
 ```
 ## My Bot with MCTS
-```
-to do
-```
-## Stats for Hierarchy bot against others:
-Tested with /example/Example_Match.py (DEFAULT_MATCH_N_BATTLES = 3, we will change it to 100 or 1000 for better data)
+I managed to create bot with Battle Policies based on Monte Carlo Tree Search.
+
+It is based on minimal MCTS template: https://gist.github.com/qpwo/c538c6f73727e254fdc7fab81024f6e1
+
+I modified it first for Tik-Tac-Toe to study the MCTS heuristic search algorithm, and I applied it
+as Battle Policy. 
+
+Node expansion assumes that the opponent is doing a bad action, which narrows a number of nodes to possible expansion.
+
+## Stats for MCTS bot against others:
+Tested with /example/Example_Match_All_bots.py (DEFAULT_MATCH_N_BATTLES = 100)
+
+Fights with all bots lasted an average of 6 minutes each, so It's quite painful to test.
+And It's good to know that I only do 50 do_rollout()'s. 
+
+Wed Jun 14 09:08:47 PM UTC 2023
 ### Random bot:
 ```
-to do
+RandomPlayer Bot vs MyPolicy Bot
+  MATCH RESULTS [40, 51]
 ```
 ### OneTurnLookahead bot:
 ```
-to do
+OneTurnLookahead Bot vs MyPolicy Bot
+  MATCH RESULTS [51, 0]
 ```
 ### Minimax bot:
 ```
-to do
+Minimax Bot vs MyPolicy Bot
+  MATCH RESULTS [51, 13]
 ```
 ### PrunedBFS bot:
 ```
-to do
+PrunedBFS Bot vs MyPolicy Bot
+  MATCH RESULTS [51, 34]
 ```
