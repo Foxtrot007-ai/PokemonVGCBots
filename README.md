@@ -22,23 +22,20 @@ I modified **Example_Match.py**, so now I can define what bots will fight.
 I use only this four bots for now.
 ```
 def main():
-    # get argument from command
+  # get argument from command
     option = sys.argv[1]
     print(option)
     # decide which opponent to test self with
-    bot = None
     if option == "RandomPlayer":
-        bot = RandomPlayer()
+         match(RandomPlayer())
     elif option == "OneTurnLookahead":
-        bot = OneTurnLookahead()
+         match(OneTurnLookahead())
     elif option == "Minimax":
-        bot = Minimax()
+         match(Minimax())
     elif option == "PrunedBFS":
-        bot = PrunedBFS()
+        match(PrunedBFS())
     else:
-        bot = RandomPlayer()
-    #play match
-    match(option)
+        match(RandomPlayer())
 ```
 
 ## Using TestBot.sh
