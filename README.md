@@ -1,7 +1,13 @@
 # PokemonVGCBots
 Few bots for Pokemon-vgc-engine
-Witam.
-## Setting up enviroment for tests:
+How to use this repository
+## Download PokemonVGCBots Engine:
+  ```
+  https://gitlab.com/DracoStriker/pokemon-vgc-engine/-/wikis/home
+  ```
+## Setting up enviroment for tests (linux version):
+In terminal get into pokemon-vgc-engine-master directory.
+Then do:
   ```
   python3 -m venv venv
   source ./venv/bin/active
@@ -18,36 +24,56 @@ Witam.
   python3 example/Example_BattleEcosystem.py 
   ```
 ## Example_Match_All_bots.py
-I modified **Example_Match.py**, so now I can define what bots will fight.
-I use only this four bots for now.
+Choose player to compete against bot.
+Use Example_Match_All_bots.py as:
 ```
-def main():
-  # get argument from command
-    option = sys.argv[1]
-    print(option)
-    # decide which opponent to test self with
-    if option == "RandomPlayer":
-         match(RandomPlayer())
-    elif option == "OneTurnLookahead":
-         match(OneTurnLookahead())
-    elif option == "Minimax":
-         match(Minimax())
-    elif option == "PrunedBFS":
-        match(PrunedBFS())
-    else:
-        match(RandomPlayer())
+python3 example/Example_Match_All_bots.py <BotName> <PlayerName>
 ```
+**BotName** = {"RandomPlayer" "OneTurnLookahead" "Minimax" "PrunedBFS" "WBukowski" "JMikolajczyk" "DBaziuk"}
+
+**PlayerName** = { "WBukowski" "JMikolajczyk" "DBaziuk"}
+
+Choose player to compete against bot.
+
+**Number of battles in one match is defined in /vgc/datatypes/Constats.py as DEFAULT_MATCH_N_BATTLES** !!!
 
 ## Using TestBot.sh
 TestBot.sh is simple bash script that starts battles with bots defined in myArray.
-It uses **Example_Match_All_bots.py** with arguments from myArray.
+It uses **Example_Match_All_bots.py** with arguments from myArray, so you can define which bot you want to battle with. 
 
 Put it in **pokemon-vgc-engine-master** directory.
+Also create **TestOutput/output.txt** for logging.
 Use it like this with virtualenvwrapper and venv configured:
 ```
-./TestBot.sh
+./TestBot.sh <PlayerName>
 ```
-Also create **TestOutput/output.txt** for logging.
+PlayerName = { "WBukowski", "JMikolajczyk", "DBaziuk"}
+
+**TestOutput/output.txt**:
+```
+  Fri Jun 16 08:12:11 PM UTC 2023
+    RandomPlayer Bot vs DBaziuk Bot
+       MATCH RESULTS [35, 51]
+    OneTurnLookahead Bot vs DBaziuk Bot
+       MATCH RESULTS [51, 17]
+    Minimax Bot vs DBaziuk Bot
+       MATCH RESULTS [51, 7]
+    PrunedBFS Bot vs DBaziuk Bot
+       MATCH RESULTS [51, 48]
+    WBukowski Bot vs DBaziuk Bot
+       MATCH RESULTS [51, 7]
+    JMikolajczyk Bot vs DBaziuk Bot
+       MATCH RESULTS [30, 51]
+    DBaziuk Bot vs DBaziuk Bot
+       MATCH RESULTS [33, 51]
+
+```
+## Player files
+There is a bot defined in **Example_|PlayerName|.py** for each tournament participant.
+
+**Example_Match_All_bots.py** uses these files to manage matches.
+
+**Remember to modify only your file** !!!
 ## Battle policy problem
 Example bots defined in BattlePolicies.py use TeamPredictions or Public information:
 >Forward Model
@@ -111,12 +137,9 @@ It is written in /engine/PkmBattleEnv.py
                                                      new_active.moves[3].power]))
 ```
 Switch function with argument -1 is random switch.
-## My Policy bot, some simple heuristics
-I put here some simple hierarchy of decisions. 
-For example, if some action is not effective or useless due to e.g. using a damaging move with a resisted type, checking will drop one level lower in hierarchy.
-## Hierarchy for know:
-## Stats for Hierarchy bot against others:
-Tested with /example/Example_Match.py (DEFAULT_MATCH_N_BATTLES = 3, we will change it to 100 or 1000 for better data)
+
+## Our bots stats against each other:
+Tested with /example/Example_Match_All_bots.py (DEFAULT_MATCH_N_BATTLES = 3, we will change it to 100 or 1000 for better data)
 ### Random bot:
 ```
 to do
@@ -142,6 +165,8 @@ I modified it first for Tik-Tac-Toe to study the MCTS heuristic search algorithm
 as Battle Policy. 
 
 Node expansion assumes that the opponent is doing a bad action, which narrows a number of nodes to possible expansion.
+
+It is defined in **Example_MyPolicy.py**
 
 ## Stats for MCTS bot against others:
 Tested with /example/Example_Match_All_bots.py (DEFAULT_MATCH_N_BATTLES = 100)
