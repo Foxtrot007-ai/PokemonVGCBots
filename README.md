@@ -73,6 +73,8 @@ There is a bot defined in **Example_|PlayerName|.py** for each tournament partic
 
 **Example_Match_All_bots.py** uses these files to manage matches.
 
+**Put this files into example directory** !!!
+
 **Remember to modify only your file** !!!
 ## Battle policy problem
 Example bots defined in BattlePolicies.py use TeamPredictions or Public information:
