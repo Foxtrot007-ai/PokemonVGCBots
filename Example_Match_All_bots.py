@@ -19,7 +19,7 @@ def match(botPolicy):
     cm0 = CompetitorManager(c0)
     cm0.team = tg.get_team()
     c1 = ExampleCompetitor("My Bot")
-    c0._battle_policy = MyPolicy()  # switch agent to test
+    c1._battle_policy = MyPolicy()  # switch agent to test
     cm1 = CompetitorManager(c1)
     cm1.team = tg.get_team()
     match = BattleMatch(cm0, cm1, debug=True)
@@ -30,19 +30,16 @@ def main():
     option = sys.argv[1]
     print(option)
     # decide which opponent to test self with
-    bot = None
     if option == "RandomPlayer":
-        bot = RandomPlayer()
+         match(RandomPlayer())
     elif option == "OneTurnLookahead":
-        bot = OneTurnLookahead()
+         match(OneTurnLookahead())
     elif option == "Minimax":
-        bot = Minimax()
+         match(Minimax())
     elif option == "PrunedBFS":
-        bot = PrunedBFS()
+        match(PrunedBFS())
     else:
-        bot = RandomPlayer()
-    #play match
-    match(option)
+        match(RandomPlayer())
 
 if __name__ == '__main__':
     main()
