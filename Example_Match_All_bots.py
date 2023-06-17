@@ -31,6 +31,7 @@ def main():
     # get argument from command
     bot_option = sys.argv[1]
     player_option = sys.argv[2]
+    number_of_matches = int(sys.argv[3])
 
     print(bot_option)
     print(" vs ")
@@ -66,7 +67,9 @@ def main():
     else:
         player = RandomPlayer() #not implemented option
 
-    #start game
-    match(bot, player)
+    # start game
+    for i in range(number_of_matches):
+        match(bot, player)
+
 if __name__ == '__main__':
     main()
