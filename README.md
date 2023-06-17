@@ -27,7 +27,7 @@ Then do:
 Choose player to compete against bot.
 Use Example_Match_All_bots.py as:
 ```
-python3 example/Example_Match_All_bots.py <BotName> <PlayerName>
+python3 example/Example_Match_All_bots.py <BotName> <PlayerName> <NumberOfMatches>
 ```
 **BotName** = {"RandomPlayer" "OneTurnLookahead" "Minimax" "PrunedBFS" "WBukowski" "JMikolajczyk" "DBaziuk"}
 
@@ -45,7 +45,7 @@ Put it in **pokemon-vgc-engine-master** directory.
 Also create **TestOutput/output.txt** for logging.
 Use it like this with virtualenvwrapper and venv configured:
 ```
-./TestBot.sh <PlayerName>
+./TestBot.sh <PlayerName> <NumberOfMatches>
 ```
 PlayerName = { "WBukowski", "JMikolajczyk", "DBaziuk"}
 
