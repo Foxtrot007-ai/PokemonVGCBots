@@ -13,6 +13,12 @@ Then do:
   source ./venv/bin/activate
   pip install -r requirements.txt
   ```
+  
+In case of error during installation of `elo` do: 
+  ```
+  pip install wheel anyjson "setuptools<58.0.0"
+  ```
+
 ## Applying routes for enviroment:
   ```
   pip install virtualenvwrapper
