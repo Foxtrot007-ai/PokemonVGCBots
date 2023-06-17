@@ -8,19 +8,49 @@ from example.MonteCarloTreeSearchTemplate import MCTS
 from vgc.behaviour import BattlePolicy
 from vgc.datatypes.Constants import DEFAULT_PKM_N_MOVES, DEFAULT_PARTY_SIZE, TYPE_CHART_MULTIPLIER, DEFAULT_N_ACTIONS
 from vgc.datatypes.Objects import PkmMove, GameState
-from vgc.datatypes.Types import PkmStat, PkmStatus, PkmType, WeatherCondition
+from vgc.datatypes.Types import PkmStat, PkmStatus, PkmType, WeatherCondition, PkmEntryHazard
+
+def estimate_damage(move_type: PkmType, pkm_type: PkmType, move_power: float, opp_pkm_type: PkmType,
+                attack_stage: int, defense_stage: int, weather: WeatherCondition) -> float:
+    stab = 1.5 if move_type == pkm_type else 1.
+    if (move_type == PkmType.WATER and weather == WeatherCondition.RAIN) or (
+            move_type == PkmType.FIRE and weather == WeatherCondition.SUNNY):
+        weather = 1.5
+    elif (move_type == PkmType.WATER and weather == WeatherCondition.SUNNY) or (
+            move_type == PkmType.FIRE and weather == WeatherCondition.RAIN):
+        weather = .5
+    else:
+        weather = 1.
+    stage_level = attack_stage - defense_stage
+    stage = (stage_level + 2.) / 2 if stage_level >= 0. else 2. / (np.abs(stage_level) + 2.)
+    damage = TYPE_CHART_MULTIPLIER[move_type][opp_pkm_type] * stab * weather * stage * move_power
+    return damage
+
+def evaluate_matchup(pkm_type: PkmType, opp_pkm_type: PkmType, moves_type: List[PkmType]) -> float:
+
+    # determine defensive matchup
+    double_damage = False
+    normal_damage = False
+    half_damage = False
+    for mtype in moves_type:
+        damage = TYPE_CHART_MULTIPLIER[mtype][pkm_type] 
+        if damage == 2.0:
+            double_damage = True
+        elif damage == 1.0:
+            normal_damage = True
+        elif damage == 0.5:
+            half_damage = True
+
+    if double_damage:
+        return 2.0
+    
+    return TYPE_CHART_MULTIPLIER[opp_pkm_type][pkm_type] 
 
 
 class DBaziukBattlePolicy(BattlePolicy):
-    """
-    Agent that selects actions randomly.
-    """
     def __init__(self, switch_probability: float = .15, n_moves: int = DEFAULT_PKM_N_MOVES,
                  n_switches: int = DEFAULT_PARTY_SIZE):
         super().__init__()
-        self.n_actions: int = n_moves + n_switches
-        self.pi: List[float] = ([(1. - switch_probability) / n_moves] * n_moves) + (
-                [switch_probability / n_switches] * n_switches)
 
     def requires_encode(self) -> bool:
         return False
@@ -29,7 +59,83 @@ class DBaziukBattlePolicy(BattlePolicy):
         pass
 
     def get_action(self, g: GameState) -> int:
-        print("DBaziuk")
-        return np.random.choice(self.n_actions, p=self.pi)
+        # get weather condition
+        weather = g.weather.condition
+
+        # get my pkms
+        my_team = g.teams[0]
+        my_active = my_team.active
+        my_party = my_team.party
+        my_attack_stage = my_team.stage[PkmStat.ATTACK]
+        my_defense_stage = my_team.stage[PkmStat.DEFENSE]
+
+        # get opp team
+        opp_team = g.teams[1]
+        opp_active = opp_team.active
+        opp_not_fainted_pkms = len(opp_team.get_not_fainted())
+        opp_attack_stage = opp_team.stage[PkmStat.ATTACK]
+        opp_defense_stage = opp_team.stage[PkmStat.DEFENSE]
+
+        # estimate damage pkm moves
+        damage: List[float] = []
+        for move in my_active.moves:
+            damage.append(estimate_damage(move.type, my_active.type, move.power, opp_active.type, my_attack_stage,
+                                          opp_defense_stage, weather))
+
+        # get most damaging move
+        move_id = int(np.argmax(damage))
+
+        #  If this damage is greater than the opponents current health we knock it out
+        if damage[move_id] >= opp_active.hp:
+            print("try to knock it out")
+            return move_id
+        
+        # If move is super effective use it
+        if damage[move_id] > 0 and TYPE_CHART_MULTIPLIER[my_active.moves[move_id].type][opp_active.type] == 2.0:
+            print("Attack with supereffective")
+            return move_id
+        
+        defense_type_multiplier = evaluate_matchup(my_active.type, opp_active.type, list(map(lambda m: m.type, opp_active.moves)))
+        print(defense_type_multiplier)
+        if defense_type_multiplier <= 1.0:
+            # Check for spike moves if spikes not setted
+            if opp_team.entry_hazard != PkmEntryHazard.SPIKES and opp_not_fainted_pkms > DEFAULT_PARTY_SIZE / 2:
+                for i in range(DEFAULT_PKM_N_MOVES):
+                    if my_active.moves[i].hazard == PkmEntryHazard.SPIKES:
+                        print("Setting Spikes")
+                        return i
+            
+            # If enemy attack and defense stage is 0 , try to use attack or defense down
+            if opp_attack_stage == 0 and opp_defense_stage == 0: 
+                for i in range(DEFAULT_PKM_N_MOVES):
+                    if my_active.moves[i].target == 1 and my_active.moves[i].stage != 0 and (my_active.moves[i].stat == PkmStat.ATTACK or my_active.moves[i].stat == PkmStat.DEFENSE):
+                        print("Debuffing enemy")
+                        return i
+                    
+            # If spikes not set try to switch
+            print("Attacking enemy to lower his hp")
+            return move_id
+
+        # If we are not switch, find pokemon with resistance 
+        matchup: List[float] = []
+        not_fainted = False
+        for pkm in my_party:
+            if pkm.hp == 0.0:
+                matchup.append(0.0)
+            else:
+                not_fainted = True
+                matchup.append(
+                    evaluate_matchup(pkm.type, opp_active.type, list(map(lambda m: m.type, opp_active.moves))))
+
+        if not_fainted:
+            print("Switching to someone else")
+            return int(np.argmin(matchup)) + 4
+
+        # If our party has no non fainted pkm, lets give maximum possible damage with current active
+        print("Nothing to do just attack")
+        return move_id
+
+    
+   
     
 
