@@ -146,6 +146,10 @@ It is written in /engine/PkmBattleEnv.py
 ```
 Switch function with argument -1 is random switch.
 
+### Pokemon moves
+
+ - We are guaranteed that every Pokemon has at least 1 STAB move.
+
 ## Our bots stats against each other:
 Tested with /example/Example_Match_All_bots.py (DEFAULT_MATCH_N_BATTLES = 3, we will change it to 100 or 1000 for better data)
 ### Random bot:
