@@ -45,6 +45,16 @@ def may_ohko(p1 : Pkm, p2 : Pkm, att_stage : int, def_stage : int, weather : Wea
             return True
     return False
 
+def pkm_coverage_score(p : Pkm):
+    try:
+        res = 0
+        for move in p.moves:
+            res += sum(TYPE_CHART_MULTIPLIER[move.type]) * move.power / 10 if move.power > 0 else 18 if move.fixed_damage > 0 else 0
+        return res
+    except:
+        print("Something went wrong")
+        return 0
+
 class WBukowskiBattlePolicy(BattlePolicy):
     def __init__(self, switch_probability: float = .15, n_moves: int = DEFAULT_PKM_N_MOVES,
                  n_switches: int = DEFAULT_PARTY_SIZE):
@@ -64,17 +74,21 @@ class WBukowskiBattlePolicy(BattlePolicy):
             if move.stat == PkmStat.ATTACK and move.stage > 0 and move.prob == 1:
                 return i
         return None
-
+    
     def find_best_for(self, t : PkmTeam, opp : Pkm, g : GameState) -> int:
         best_selection = None
+        print("Looking for best opponent for {}".format(opp))
         for i, pkm in enumerate([t.active] + t.party):
+            print("Candidate {}: {}".format(i+1, pkm))
+            if pkm.fainted():
+                continue
             if not may_be_supereffective(opp, pkm) and may_be_supereffective(pkm, opp):
                 return i
             if may_be_supereffective(pkm, opp):
                 best_selection = i
             elif best_selection is None and not may_be_supereffective(opp, pkm) :
                 best_selection = i
-        return best_selection if not best_selection is None else 0
+        return best_selection if not best_selection is None else 1 if t.active.status == PkmStatus.CONFUSED else 0
 
     def get_action(self, g : GameState) -> int:
         weather = g.weather.condition
@@ -102,31 +116,73 @@ class WBukowskiBattlePolicy(BattlePolicy):
 
         # knock-out if possible
         if damage[most_damaging_move] >= opp_active.hp:
+            print("OHKO try")
             return most_damaging_move
-
+        print("No OHKO")
 
         # if we know for sure that opp cannot knock us out  
-        opp_known_moves = list(filter(lambda m: m.name, opp_active.moves))      
-        all_moves_known = len(opp_known_moves) == 4
-        if all_moves_known and all(estimate_damage(move.type, opp_active.type, move.power, my_active.type, opp_attack_stage, my_defense_stage, weather) < my_active.hp for move in opp_known_moves):
-            boost = self.get_attack_boosting_move(my_active)
-            if boost is not None:
-                return boost
-            return most_damaging_move
-        
+        # opp_known_moves = list(filter(lambda m: m.name, opp_active.moves))      
+        # all_moves_known = len(opp_known_moves) == 4
+        # if all_moves_known and all(estimate_damage(move.type, opp_active.type, move.power, my_active.type, opp_attack_stage, my_defense_stage, weather) < my_active.hp for move in opp_known_moves):
+        #     boost = self.get_attack_boosting_move(my_active)
+        #     if boost is not None:
+        #         print("Boosting ATT")
+        #         return boost
+        # print("No boosting moves")
+            
         # other mon can ohko opp
-        for i, pkm in enumerate(my_team.party):
+        for i in my_team.get_not_fainted():
+            print(i)
+            pkm = my_team.party[i]
             if may_ohko(pkm, opp_active, 0, opp_defense_stage, weather) and not may_ohko(opp_active, pkm, opp_attack_stage, 0, weather):
-                return i + 3
+                print("Switching to {} to OHKO".format(i + 4))
+                return i + 4
 
-        # opp can be supereffective
-        if may_be_supereffective(opp_active, my_active):
-            to_switch = self.find_best_for(my_team, opp_active)
-            if to_switch == 0:
-                return most_damaging_move
-            else:
-                return to_switch + 3
+        # print("No chance for OHKO")
 
-        return most_damaging_move
-    
+        # # opp can be supereffective
+        # if may_be_supereffective(opp_active, my_active):
+        #     print("Opp may be supereffective")
+        #     to_switch = self.find_best_for(my_team, opp_active, g)
+        #     if to_switch != 0:
+        #         print("Switch cause of type disadvantage")
+        #         return to_switch + 3
+        #     else:
+        #         print("No switch, no party member is good for these opponent")
 
+        # getting the best move
+        move_value : List[float] = []
+        for i, pkm in enumerate([my_active] + my_team.party):
+            if pkm.fainted():
+                continue
+            pkm_score = (may_be_supereffective(pkm, opp_active)-may_be_supereffective(opp_active, pkm)) * 15 + 0.03 * pkm_coverage_score(pkm)
+            
+            att_stage = my_attack_stage if i == 0 else 0
+            for move in pkm.moves:
+                priority_bonus = 1.05 if move.priority else 1
+                lock_bonus = 7.0
+                dmg_bonus = 2.5
+                status_weights = [0, lock_bonus, dmg_bonus, lock_bonus, lock_bonus, lock_bonus, dmg_bonus]
+                stat_change_weights = [3.0, 1.0, 1.3]
+                target_sign = 1 if move.target == 1 else -1
+
+                switch_malus = 0.75 if i != 0 else 1
+                dmg = estimate_damage(move.type, pkm.type, move.power, opp_active.type, att_stage, opp_defense_stage, weather) if move.fixed_damage == 0 else move.fixed_damage
+
+                attack_score = dmg * move.acc * priority_bonus
+                status_score = 10 * target_sign * status_weights[move.status] * move.prob * move.acc
+                stat_change_score = 10 * -target_sign * move.stage * stat_change_weights[move.stat] * (1 - my_team.stage[move.stat] / 5) * move.prob * move.acc
+                recovery_score = float("-inf") if (pkm.hp + move.recover) / pkm.max_hp <= 0.4 and move.recover < 0 else 150 * move.recover / pkm.max_hp
+
+                score = (pkm_score + attack_score + status_score + stat_change_score + recovery_score) * switch_malus
+                print("{} got score {}, from: pkm={};attack={};status={};stats={};recovery={}".format(move, score, pkm_score, attack_score, status_score, stat_change_score, recovery_score))
+                move_value.append(score)
+        print("Moves evaluated")
+
+        chosen = int(np.argmax(move_value))
+        if chosen < 4:
+            print("Choosing {}".format(my_active.moves[chosen]))
+            return chosen
+        else:
+            print("Switching to {}".format(chosen // 4 + 3))
+            return chosen // 4 + 3
