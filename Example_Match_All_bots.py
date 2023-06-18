@@ -4,10 +4,7 @@ from agent.Example_Competitor import ExampleCompetitor
 from example.Example_WBukowski import WBukowskiBattlePolicy
 from example.Example_JMikolajczyk import JMikolajczykBattlePolicy
 from example.Example_DBaziuk import DBaziukBattlePolicy
-from vgc.behaviour.BattlePolicies import Minimax
-from vgc.behaviour.BattlePolicies import RandomPlayer
-from vgc.behaviour.BattlePolicies import OneTurnLookahead
-from vgc.behaviour.BattlePolicies import PrunedBFS
+from vgc.behaviour.BattlePolicies import RandomPlayer, OneTurnLookahead, TypeSelector, Minimax, PrunedBFS
 from vgc.competition.BattleMatch import BattleMatch
 from vgc.competition.Competitor import CompetitorManager
 from vgc.util.generator.PkmRosterGenerators import RandomPkmRosterGenerator
@@ -43,6 +40,8 @@ def main():
         bot = RandomPlayer()
     elif bot_option == "OneTurnLookahead":
         bot = OneTurnLookahead()
+    elif bot_option == "TypeSelector":
+        bot = TypeSelector()
     elif bot_option == "Minimax":
         bot = Minimax()
     elif bot_option == "PrunedBFS":
