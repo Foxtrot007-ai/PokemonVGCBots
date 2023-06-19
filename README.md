@@ -1,11 +1,20 @@
 # PokemonVGCBots
+
+## Contents
+
+- [Usage](#usage)
+- [Observations & Tips](#tips)
+- [Test results](#tests)
+
+## <a name="usage"> Usage
+
 Few bots for Pokemon-vgc-engine
 How to use this repository
-## Download PokemonVGCBots Engine:
+### Download PokemonVGCBots Engine:
   ```
   https://gitlab.com/DracoStriker/pokemon-vgc-engine/-/wikis/home
   ```
-## Setting up enviroment for tests (linux version):
+### Setting up enviroment for tests (linux version):
 In terminal get into pokemon-vgc-engine-master directory.
 Then do:
   ```
@@ -19,17 +28,17 @@ In case of error during installation of `elo` do:
   pip install wheel anyjson "setuptools<58.0.0"
   ```
 
-## Applying routes for enviroment:
+### Applying routes for enviroment:
   ```
   pip install virtualenvwrapper
   source ./venv/bin/virtualenvwrapper.sh
   add2virtualenv .
   ```
-## Trying some examples:
+### Trying some examples:
   ```
   python3 example/Example_BattleEcosystem.py 
   ```
-## Example_Match_All_bots.py
+### Example_Match_All_bots.py
 Choose player to compete against bot.
 Use Example_Match_All_bots.py as:
 ```
@@ -43,7 +52,7 @@ Choose player to compete against bot.
 
 **Number of battles in one match is defined in /vgc/datatypes/Constats.py as DEFAULT_MATCH_N_BATTLES** !!!
 
-## Using TestBot.sh
+### Using TestBot.sh
 TestBot.sh is simple bash script that starts battles with bots defined in myArray.
 It uses **Example_Match_All_bots.py** with arguments from myArray, so you can define which bot you want to battle with. 
 
@@ -74,7 +83,7 @@ PlayerName = { "WBukowski", "JMikolajczyk", "DBaziuk"}
        MATCH RESULTS [33, 51]
 
 ```
-## Player files
+### Player files
 There is a bot defined in **Example_|PlayerName|.py** for each tournament participant.
 
 **Example_Match_All_bots.py** uses these files to manage matches.
@@ -82,6 +91,7 @@ There is a bot defined in **Example_|PlayerName|.py** for each tournament partic
 **Put this files into example directory** !!!
 
 **Remember to modify only your file** !!!
+
 ## Battle policy problem
 Example bots defined in BattlePolicies.py use TeamPredictions or Public information:
 >Forward Model
@@ -102,7 +112,9 @@ Example bots defined in BattlePolicies.py use TeamPredictions or Public informat
 >  ```
 So in my opinion, MinMax example and BFS example bots are quite useless at start, but may be useful 
 in battles with a lot of pokemon switches.
-## Information we know for 100%
+
+## <a name="tips"> Observations & Tips
+
 ### My pokemon team info:
 We know every thing. For example:
 - Stats, status, list of moves, type and stages for active pokemon
@@ -150,7 +162,65 @@ Switch function with argument -1 is random switch.
 
  - We are guaranteed that every Pokemon has at least 1 STAB move.
 
-## Our bots stats against each other:
+### Status
+
+#### POISONED
+  - Poison and Steel types are immune to it
+  - deals 12.5% max health at end of turn
+  - is permanent
+#### PARALYZED
+  - Electric and Ground types are immune to it
+  - will try to make a move with probability 75%
+  - is permanent
+#### SLEEP
+  - can't move till removed
+  - maximum duration is 4 turns, chance to wake up every turn with 50% probability
+#### BURNED
+  - deals 12.% max health at end of turn
+  - is permanent
+#### (special) CONFUSED
+  - can appear with any other effect
+  - 1/3 chance of hitting yourselves (with 12.5% max health damage) instead of target
+  - maximum duration is 4 turns, chance to snap out of confusion every turn with 50% probability
+  - disappears when pokemon is switched
+
+### Weather
+
+- set before attack
+- damage from weather is applied at the end of turn
+- lasts 6 turns
+
+#### SUNNY
+- boosts Fire attacks (1.5 * dmg) and debuffs Water attacks (0.5 * dmg)
+
+#### RAIN
+- boost Water attacks (1.5 * dmg) and debuffs Water attacks (0.5 * dmg)
+
+#### SANDSTORM
+- deals 12.5% max pokemon health every turn
+- doesn't damage Rock, Ground and Steel types
+
+#### HAIL
+- deals 12.5% max pokemon health every turn
+- doesn't damage Ice types
+
+### Entry hazard
+
+#### SPIKES
+1/8 1/6 1/4 
+- stack up to three
+- deal 1/8, 1/6, 1/4 max health depending on stackage when Pokemon switches in
+- don't damage Flying types
+- cannot be removed
+
+### Bugs
+
+- Frozen status has no effect (there's no single check for it) and cannot even be inflicted
+- Burn status cannot be inflicted
+
+## <a name="tests"> Tests
+
+### Our bots stats against each other:
 Tested with /example/Example_Match_All_bots.py (DEFAULT_MATCH_N_BATTLES = 3, we will change it to 100 or 1000 for better data)
 
 For 1000 games:
@@ -198,7 +268,7 @@ PrunedBFS 169 vs 831 JMikolajczyk
 PrunedBFS 213 vs 787 DBaziuk 
 PrunedBFS 192 vs 808 WBukowski 
 ```
-## My Bot with MCTS
+### Dominik's Bot with MCTS
 I managed to create bot with Battle Policies based on Monte Carlo Tree Search.
 
 It is based on minimal MCTS template: https://gist.github.com/qpwo/c538c6f73727e254fdc7fab81024f6e1
@@ -210,7 +280,7 @@ Node expansion assumes that the opponent is doing a bad action, which narrows a 
 
 It is defined in **Example_MyPolicy.py**
 
-## Stats for MCTS bot against others:
+### Stats for MCTS bot against others:
 Tested with /example/Example_Match_All_bots.py (DEFAULT_MATCH_N_BATTLES = 100)
 
 Fights with all bots lasted an average of 6 minutes each, so It's quite painful to test.
