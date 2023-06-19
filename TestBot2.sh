@@ -16,6 +16,6 @@ declare -n selected=$3
 for str in ${selected[@]}; do
   if [ "$str" != "$1" ]; then
     echo -n "$str Bot vs $1 Bot - "
-    python3 example/Example_Match_All_bots.py $str $1 $2 | grep "MATCH RESULTS" | sed -e 's/[^0-9]/ /g' -e 's/^ *//g' -e 's/ *$//g' | awk '{if ($1 < $2) SUM += 1; else SUM2 += 1} END { print "[" SUM2 ", " SUM "]"}'
+    python3 Match_All_bots.py $str $1 $2 | grep "MATCH RESULTS" | sed -e 's/[^0-9]/ /g' -e 's/^ *//g' -e 's/ *$//g' | awk '{if ($1 < $2) SUM += 1; else SUM2 += 1} END { print "[" SUM2 ", " SUM "]"}'
   fi
 done

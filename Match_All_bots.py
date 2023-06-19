@@ -1,9 +1,9 @@
 import sys
 
 from agent.Example_Competitor import ExampleCompetitor
-from example.Example_WBukowski import WBukowskiBattlePolicy
-from example.Example_JMikolajczyk import JMikolajczykBattlePolicy
-from example.Example_DBaziuk import DBaziukBattlePolicy
+from ourbots.WBukowski_Bot import WBukowskiBattlePolicy
+from ourbots.JMikolajczyk_Bot import JMikolajczykBattlePolicy
+from ourbots.DBaziuk_Bot import DBaziukBattlePolicy
 from vgc.behaviour.BattlePolicies import RandomPlayer, OneTurnLookahead, TypeSelector, Minimax, PrunedBFS
 from vgc.competition.BattleMatch import BattleMatch
 from vgc.competition.Competitor import CompetitorManager

@@ -4,7 +4,6 @@ from typing import List
 import PySimpleGUI as sg
 import numpy as np
 
-from example.MonteCarloTreeSearchTemplate import MCTS
 from vgc.behaviour import BattlePolicy
 from vgc.datatypes.Constants import DEFAULT_PKM_N_MOVES, DEFAULT_PARTY_SIZE, TYPE_CHART_MULTIPLIER, DEFAULT_N_ACTIONS
 from vgc.datatypes.Objects import PkmMove, GameState
