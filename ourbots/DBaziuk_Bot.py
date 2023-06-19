@@ -4,6 +4,7 @@ from typing import List
 import PySimpleGUI as sg
 import numpy as np
 
+from example.MonteCarloTreeSearchTemplate import MCTS
 from vgc.behaviour import BattlePolicy
 from vgc.datatypes.Constants import DEFAULT_PKM_N_MOVES, DEFAULT_PARTY_SIZE, TYPE_CHART_MULTIPLIER, DEFAULT_N_ACTIONS
 from vgc.datatypes.Objects import PkmMove, GameState
@@ -50,6 +51,8 @@ class DBaziukBattlePolicy(BattlePolicy):
     def __init__(self, switch_probability: float = .15, n_moves: int = DEFAULT_PKM_N_MOVES,
                  n_switches: int = DEFAULT_PARTY_SIZE):
         super().__init__()
+        self.hail_used = False
+        self.sandstorm_used = False
 
     def requires_encode(self) -> bool:
         return False
@@ -104,13 +107,43 @@ class DBaziukBattlePolicy(BattlePolicy):
                         print("Setting Spikes")
                         return i
             
+            # Use sandstorm if not setted and you have pokemons immune to that
+            if weather != WeatherCondition.SANDSTORM and not self.sandstorm_used and defense_type_multiplier < 1.0:
+                sandstorm_move = -1
+                for i in range(DEFAULT_PKM_N_MOVES):
+                    if my_active.moves[i].weather == WeatherCondition.SANDSTORM:
+                        sandstorm_move = i
+                immune_pkms = 0
+                for pkm in my_party:
+                    if not pkm.fainted() and pkm.type in [PkmType.GROUND, PkmType.STEEL, PkmType.ROCK]:
+                        immune_pkms += 1
+                if sandstorm_move != -1 and immune_pkms > 2:
+                    print("Using Sandstorm")
+                    self.sandstorm_used = True
+                    return sandstorm_move
+
+            # Use hail if not setted and you have pokemons immune to that
+            if weather != WeatherCondition.HAIL and not self.hail_used and defense_type_multiplier < 1.0:
+                hail_move = -1
+                for i in range(DEFAULT_PKM_N_MOVES):
+                    if my_active.moves[i].weather == WeatherCondition.HAIL:
+                        hail_move = i
+                immune_pkms = 0
+                for pkm in my_party:
+                    if not pkm.fainted() and pkm.type in [PkmType.ICE]:
+                        immune_pkms += 1
+                if hail_move != -1 and immune_pkms > 2:
+                    print("Using Hail")
+                    self.hail_used = True
+                    return hail_move
+
             # If enemy attack and defense stage is 0 , try to use attack or defense down
             if opp_attack_stage == 0 and opp_defense_stage == 0: 
                 for i in range(DEFAULT_PKM_N_MOVES):
                     if my_active.moves[i].target == 1 and my_active.moves[i].stage != 0 and (my_active.moves[i].stat == PkmStat.ATTACK or my_active.moves[i].stat == PkmStat.DEFENSE):
                         print("Debuffing enemy")
                         return i
-                    
+            
             # If spikes not set try to switch
             print("Attacking enemy to lower his hp")
             return move_id
@@ -126,9 +159,10 @@ class DBaziukBattlePolicy(BattlePolicy):
                 matchup.append(
                     evaluate_matchup(pkm.type, opp_active.type, list(map(lambda m: m.type, opp_active.moves))))
 
-        if not_fainted:
+        best_switch = int(np.argmin(matchup))
+        if not_fainted and my_party[best_switch] != my_active:
             print("Switching to someone else")
-            return int(np.argmin(matchup)) + 4
+            return  best_switch + 4
 
         # If our party has no non fainted pkm, lets give maximum possible damage with current active
         print("Nothing to do just attack")
