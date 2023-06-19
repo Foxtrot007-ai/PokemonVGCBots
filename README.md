@@ -156,7 +156,7 @@ Tested with /example/Example_Match_All_bots.py (DEFAULT_MATCH_N_BATTLES = 3, we 
 For 1000 games:
 |                | **JMikolajczyk** | **DBaziuk** | **WBukowski**
 |----------------|------------------|-------------|--------------
-|**JMikołajczyk**|        X         | 484 vs 516  |544 vs 456
+|**JMikołajczyk**|         X        | 484 vs 516  |544 vs 456
 |   **DBaziuk**  |     516 vs 484   |       X     |560 vs 440
 | **WBukowski**  |     456 vs 544   | 440 vs 560  |    X
 
@@ -170,19 +170,33 @@ For 10'000 games:
 
 ### Random bot:
 ```
-to do
+Random  93 vs 907 JMikolajczyk 
+Random 134 vs 866 DBaziuk 
+Random  95 vs 905 WBukowski 
 ```
 ### OneTurnLookahead bot:
 ```
-to do
+OneTurnLookahed 416 vs 584 JMikolajczyk 
+OneTurnLookahed 369 vs 631 DBaziuk 
+OneTurnLookahed 468 vs 532 WBukowski 
+```
+### TypeSelector bot:
+```
+TypeSelector 160 vs 840 JMikolajczyk 
+TypeSelector 162 vs 838 DBaziuk 
+TypeSelector 288 vs 712 WBukowski 
 ```
 ### Minimax bot:
 ```
-to do
+Minimax 201 vs 799 JMikolajczyk 
+Minimax 201 vs 799 DBaziuk 
+Minimax 218 vs 782 WBukowski 
 ```
 ### PrunedBFS bot:
 ```
-to do
+PrunedBFS 169 vs 831 JMikolajczyk 
+PrunedBFS 213 vs 787 DBaziuk 
+PrunedBFS 192 vs 808 WBukowski 
 ```
 ## My Bot with MCTS
 I managed to create bot with Battle Policies based on Monte Carlo Tree Search.
