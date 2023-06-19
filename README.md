@@ -174,14 +174,14 @@ status can be overwritten except confused
   - is permanent
 #### SLEEP
   - can't move till removed
-  - maximum duration is 4 turns, chance to wake up every turn with 50% probability
+  - maximum duration is 4 turns, chance to wake up every turn with 50% probability (before attack)
 #### BURNED
   - deals 12.% max health at end of turn
   - is permanent
 #### (special) CONFUSED
   - can appear with any other effect
   - 1/3 chance of hitting yourselves (with 12.5% max health damage) instead of target
-  - maximum duration is 4 turns, chance to snap out of confusion every turn with 50% probability
+  - maximum duration is 4 turns, chance to snap out of confusion every turn with 50% probability (before attack)
   - disappears when pokemon is switched
 
 ### Weather
