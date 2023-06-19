@@ -152,6 +152,22 @@ Switch function with argument -1 is random switch.
 
 ## Our bots stats against each other:
 Tested with /example/Example_Match_All_bots.py (DEFAULT_MATCH_N_BATTLES = 3, we will change it to 100 or 1000 for better data)
+
+For 1000 games:
+|                | **JMikolajczyk** | **DBaziuk** | **WBukowski**
+|----------------|------------------|-------------|--------------
+|**JMikołajczyk**|        X         | 484 vs 516  |544 vs 456
+|   **DBaziuk**  |     516 vs 484   |       X     |560 vs 440
+| **WBukowski**  |     456 vs 544   | 440 vs 560  |    X
+
+For 10'000 games:
+|                | **JMikolajczyk** | **DBaziuk** | **WBukowski**
+|----------------|------------------|-------------|--------------
+|**JMikołajczyk**|        X         | 4771 vs 5229|5405 vs 4595
+|   **DBaziuk**  |     5229 vs 4771 |       X     |5501 vs 4499
+| **WBukowski**  |   4595 vs 5405   |5501 vs 4499 |    X
+
+
 ### Random bot:
 ```
 to do
