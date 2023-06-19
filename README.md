@@ -163,7 +163,7 @@ Switch function with argument -1 is random switch.
  - We are guaranteed that every Pokemon has at least 1 STAB move.
 
 ### Status
-
+status can be overwritten except confused
 #### POISONED
   - Poison and Steel types are immune to it
   - deals 12.5% max health at end of turn
